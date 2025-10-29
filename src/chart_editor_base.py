@@ -7,7 +7,7 @@ class ChartEditor(tk.Tk):
     def __init__(self):
         # chart_editor_base.py など
         APP_NAME = "TapLine 譜面エディター"
-        APP_VERSION = "0.6.4"
+        APP_VERSION = "0.7.0"
         super().__init__()
         self.title(f"{APP_NAME} Ver.{APP_VERSION}")
         self.geometry("1000x700")
@@ -17,6 +17,8 @@ class ChartEditor(tk.Tk):
         self.total_measures = 4
         self.measure_height = 400
         self.canvas_width = 360
+        self.audio_path = None
+        self.is_playing = False
 
         # 追加：スナップ設定
         self.snap_mode = tk.StringVar(value="なし")  # "なし" / "3分" / "4分" / "5分" / "6分"
@@ -182,7 +184,7 @@ class ChartEditor(tk.Tk):
         self.canvas.configure(yscrollcommand=self.v_scroll.set)
         self.canvas.pack(side="left", fill="both", expand=True)
         self.v_scroll.pack(side="right", fill="y")
-        self.label_tips = ttk.Label(layer_frame,text=f"ショートカットキーは、Pro Modeを有効にすると使用可能となります。")
+        self.label_tips = ttk.Label(layer_frame,text=f"一部を除くショートカットキーは、Pro Modeを有効にすると使用可能となります。")
         self.label_tips.pack(side="left", padx=3)
 
         self.dragging_lane = None
@@ -202,6 +204,8 @@ class ChartEditor(tk.Tk):
         self.bind("n", lambda e: self.set_mode("note",True))
         self.bind("l", lambda e: self.set_mode("lane",True))
         self.bind("s", lambda e: self.set_mode("select",True))
+        self.bind("<space>", lambda e: self.play_audio())
+        # self.bind("s", lambda e: self.stop_audio)
         # if self.pro_mode_var.get():
             # self.bind("1", lambda e: self.set_mode("note",True))
         # self.canvas.bind("<MouseWheel>", self.on_scroll)
@@ -212,6 +216,7 @@ class ChartEditor(tk.Tk):
         self.draw_lanes()#current_measure=0
         self.draw_notes()
         self.bind_scroll_events()
+        self.drew_audio_play_line()
 
 
     def on_mode_change(self, event=None):
