@@ -2,6 +2,21 @@
 Rinnegamesで使用している、音楽ゲーム向けのEditorです。
 AI支援（ChatGPT）を活用して開発されました。 
 企画・仕様設計および最終調整：Rinnegames（凛音）
+## 使用ライブラリ
+
+### 標準ライブラリ
+- `tkinter`（`ttk`, `filedialog`, `messagebox`）
+- `math`
+- `re`
+- `json`
+- `platform`
+
+### 外部ライブラリ
+- [`mutagen`](https://mutagen.readthedocs.io/)  
+  音声ファイル（MP3 / OGG）のメタデータ解析に使用。
+- [`pygame`](https://www.pygame.org/)  
+  音声プレビューや再生処理に使用。
+
 # エクスポートされる譜面形式
 `tlc`:
 ```
