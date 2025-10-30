@@ -95,7 +95,7 @@ class ChartEditor(tk.Tk):
         # プロモードチェック
         self.pro_mode_var = tk.BooleanVar(value=False)
         settings_menu.add_checkbutton(
-            label="プロモード",
+            label="Proモード",
             variable=self.pro_mode_var,
             #command=self.on_pro_mode_toggle
             #state="disabled"  # ← 無効化
@@ -184,7 +184,7 @@ class ChartEditor(tk.Tk):
         self.canvas.configure(yscrollcommand=self.v_scroll.set)
         self.canvas.pack(side="left", fill="both", expand=True)
         self.v_scroll.pack(side="right", fill="y")
-        self.label_tips = ttk.Label(layer_frame,text=f"一部を除くショートカットキーは、Pro Modeを有効にすると使用可能となります。")
+        self.label_tips = ttk.Label(layer_frame,text=f"一部を除くショートカットキーは、Proモードを有効にすると使用可能となります。")
         self.label_tips.pack(side="left", padx=3)
 
         self.dragging_lane = None

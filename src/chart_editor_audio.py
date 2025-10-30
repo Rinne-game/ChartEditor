@@ -79,13 +79,16 @@ class ChartEditor(ChartEditor):
         measures = (pos_ms / 1000.0) * bpm / 60 / 4
         return measures
     def drew_audio_play_line(self):
-        self.canvas.delete("play_line")
-        if  self.audio_path:
-            x1 = ((-1+1)/2*self.canvas_width)+(self.canvas_width/2)
-            x2 = ((1+1)/2*self.canvas_width)+(self.canvas_width/2)
-            y=(self.get_audio_position()*-1)
-            # y=(self.total_measures-self.get_audio_position())*self.measure_height
-            y_max=self.total_measures*self.measure_height
-            self.canvas.create_line(x1, y*self.measure_height, x2, y*self.measure_height,
-                                        fill="red", width=4, tags="play_line")#, dash=(4,2)
+        try:
+            self.canvas.delete("play_line")
+            if  self.audio_path:
+                x1 = ((-1+1)/2*self.canvas_width)+(self.canvas_width/2)
+                x2 = ((1+1)/2*self.canvas_width)+(self.canvas_width/2)
+                y=(self.get_audio_position()*-1)
+                # y=(self.total_measures-self.get_audio_position())*self.measure_height
+                y_max=self.total_measures*self.measure_height
+                self.canvas.create_line(x1, y*self.measure_height, x2, y*self.measure_height,
+                                            fill="red", width=4, tags="play_line")#, dash=(4,2)
+        except Exception as e:
+            print(f"予期しないエラーが発生しました: {e}")
         self.after(16, self.drew_audio_play_line)
