@@ -6,7 +6,7 @@
 cd src
 
 pyinstaller --onefile --noconsole main.py \
---name "TuningLaneEditor" \
+--name "ChartEditor" \
 --distpath ../build/mac \
 --workpath ../build/mac/temp \
 --specpath ../build/mac

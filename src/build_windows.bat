@@ -6,7 +6,7 @@ REM ===============================
 cd src
 
 pyinstaller --onefile --noconsole main.py ^
---name "TuningLaneEditor" ^
+--name "ChartEditor" ^
 --distpath ../build/windows ^
 --workpath ../build/windows/temp ^
 --specpath ../build/windows
