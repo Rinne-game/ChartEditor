@@ -61,6 +61,52 @@ class ChartEditor(ChartEditor):
 
         # 再描画（新ノーツだけを描画してもOK）
         self.draw_notes()
+    def on_canvas_click_D(self, event):
+        # Canvas 内部座標に変換（スクロール対応）
+        cx = self.canvas.canvasx(event.x)
+        cy = self.canvas.canvasy(event.y)
+
+        # 上昇スクロールでは y が負方向に増えるため反転して小節位置を得る
+        measure_float = -cy / self.measure_height
+
+        # === 小節・拍計算 ===
+        bpm_beats = getattr(self, "beats_per_measure", 4)
+        measure_index = math.floor(measure_float)
+        beat_fraction = (measure_float - measure_index) * bpm_beats
+
+        # === 🔧 スナップ補正 ===
+        mode = self.snap_mode.get()
+        snap_div = {
+            "3分": 3,
+            "4分": 4,
+            "5分": 5,
+            "6分": 6,
+        }.get(mode, None)
+
+        if snap_div:
+            snap_unit = 1 / snap_div
+            beat_fraction = round(beat_fraction / snap_unit) * snap_unit
+
+        # === レーン推定 ===
+        lane_id = self.get_nearest_lane(cx, measure_float)
+        layer = self.layer_var.get()
+
+        # === 右クリック時（削除） ===
+        removed = False
+        for i, existing in enumerate(self.notes):
+            if (
+                existing["lane"] == lane_id
+                and abs(existing["measure"] - measure_index) < 1e-6
+                and abs(existing["beat"] - beat_fraction) < 1e-6
+                and existing["layer"] == layer
+            ):
+                del self.notes[i]
+                removed = True
+                print(f"Note deleted: lane={lane_id}, measure={measure_index}, beat={beat_fraction}")
+                break
+
+        if removed:
+            self.draw_notes()
 
 
     def get_nearest_lane(self, x, measure_float):

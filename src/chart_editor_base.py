@@ -35,6 +35,11 @@ class ChartEditor(tk.Tk):
         settings_File.add_command(label = "名前を付けて保存",  accelerator="Ctrl+S")
         settings_File.add_command(label = "音楽ファイルを選択")
 
+        settings_Edit = tk.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="編集", menu=settings_Edit)
+        settings_Edit.add_command(label = "元に戻す")
+        settings_Edit.add_command(label = "やり直し")
+
         settings_menu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="設定", menu=settings_menu)
         settings_menu.add_checkbutton(
@@ -80,18 +85,31 @@ class ChartEditor(tk.Tk):
 
         settings_File = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="ファイル", menu=settings_File)
+        settings_Edit = tk.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="編集", menu=settings_Edit)
         if os_name == "Darwin":#Mac版はcommandになる
             settings_File.add_command(label = "ファイルを開く",command=self.load_tlc,  accelerator="Cmd+O")#,state="disabled"
             settings_File.add_command(label = "名前を付けて保存",command=self.save_tlc,  accelerator="Cmd+S")
+            settings_File.add_separator() # ここに線が挿入される
             settings_File.add_command(label = "音楽ファイルを選択" ,command=self.load_audio)
+            settings_Edit.add_command(label = "元に戻す",  accelerator="Cmd+Z",state="disabled")
+            settings_Edit.add_command(label = "やり直し",  accelerator="Shift+Cmd+Z",state="disabled")
+            self.bind("<Command-s>", self.save_tlc)
+            self.bind("<Command-o>", self.load_tlc)
         else:
             settings_File.add_command(label = "ファイルを開く",command=self.load_tlc,  accelerator="Ctrl+O")
             settings_File.add_command(label = "名前を付けて保存",command=self.save_tlc,  accelerator="Ctrl+S")
+            settings_File.add_separator() # ここに線が挿入される
             settings_File.add_command(label = "音楽ファイルを選択" ,command=self.load_audio)
+            settings_Edit.add_command(label = "元に戻す",  accelerator="Ctrl+Z",state="disabled")
+            settings_Edit.add_command(label = "やり直し",  accelerator="Shift+Ctrl+Z",state="disabled")
+            self.bind("<Control-s>", self.save_tlc)
+            self.bind("<Control-o>", self.load_tlc)
+
         # 「設定」メニュー
         settings_menu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="設定", menu=settings_menu)
-# self.pro_mode_var.get()
+        # self.pro_mode_var.get()
         # プロモードチェック
         self.pro_mode_var = tk.BooleanVar(value=False)
         settings_menu.add_checkbutton(
@@ -206,8 +224,13 @@ class ChartEditor(tk.Tk):
         self.bind("s", lambda e: self.set_mode("select",True))
         self.bind("<space>", lambda e: self.play_audio())
         # self.bind("s", lambda e: self.stop_audio)
-        # if self.pro_mode_var.get():
-            # self.bind("1", lambda e: self.set_mode("note",True))
+        self.bind("1", lambda e: self.set_note_type("Tap"))
+        self.bind("2", lambda e: self.set_note_type("Feel"))
+        self.bind("3", lambda e: self.set_note_type("Slide-L"))#self.set_note_type("Slide-L")
+        self.bind("4", lambda e: self.set_note_type("Slide-R"))#self.set_note_type("Slide-R")
+        # note_types = ["Tap", "Feel", "Slide-L", "Slide-R", "Hold"]
+            #self.set_note_type("Tap")
+            # self.bind("5", lambda e: self.note_type_var = "Tap")
         # self.canvas.bind("<MouseWheel>", self.on_scroll)
 
 
@@ -259,6 +282,8 @@ class ChartEditor(tk.Tk):
             self.canvas.bind("<B3-Motion>", self.drag_lane)
             self.canvas.bind("<ButtonRelease-3>", self.end_lane_drag)
             self.canvas.bind("<Button-3>", self.on_canvas_right_click)  # 右クリックでレーン追加
+        elif self.mode == "select":
+            self.canvas.bind("<Shift-Button-1>", self.on_canvas_click_D)
     # 選択モードは後で拡張可
     def bind_scroll_events(self):
         """マウスホイール・ドラッグによるスクロール制御を設定"""
@@ -309,5 +334,10 @@ class ChartEditor(tk.Tk):
         self.draw_lanes()#current_measure=0
         self.draw_notes()
 
-
-
+    def set_note_type(self,Ntype):
+        print(Ntype)
+        if self.pro_mode_var.get()!=True:
+            return
+        # self.note_type_var=Ntype
+        #self.mode_var.set("ノーツ配置(N)")
+        self.note_type_var.set(Ntype)

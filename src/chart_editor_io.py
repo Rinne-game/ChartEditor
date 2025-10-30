@@ -7,7 +7,7 @@ class ChartEditor(ChartEditor):
     # ===============================
     # 📤 保存 (.tlc)
     # ===============================
-    def save_tlc(self):
+    def save_tlc(self, event=None):
         path = filedialog.asksaveasfilename(
             title="譜面ファイルを保存",
             defaultextension=".tlc",
@@ -69,7 +69,7 @@ class ChartEditor(ChartEditor):
     # ===============================
     # 📥 読み込み (.tlc)
     # ===============================
-    def load_tlc(self):
+    def load_tlc(self, event=None):
         path = filedialog.askopenfilename(
             title="譜面ファイルを読み込み",
             filetypes=[("TapLineChart/RythmGame Chart", "*.tlc *.rgc")]
