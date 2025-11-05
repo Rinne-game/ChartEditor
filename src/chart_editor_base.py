@@ -1,19 +1,18 @@
 import tkinter as tk
 from tkinter import ttk, filedialog
 import platform
-import pygame
 
 class ChartEditor(tk.Tk):
     def __init__(self):
         # chart_editor_base.py など
         APP_NAME = "TapLine 譜面エディター"
-        APP_VERSION = "1.0.0"
+        APP_VERSION = "1.0.2"
         super().__init__()
         self.title(f"{APP_NAME} Ver.{APP_VERSION}")
-        self.geometry("1000x700")
+        self.geometry("1000x980")
 
         self.bpm = tk.DoubleVar(value=120.0)
-        self.lane_count = 6
+        self.lane_count = 4
         self.total_measures = 4
         self.measure_height = 400
         self.canvas_width = 360
@@ -109,8 +108,11 @@ class ChartEditor(tk.Tk):
         # 「設定」メニュー
         settings_menu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="設定", menu=settings_menu)
+        settings_menu.add_command(label = "詳細設定",state="disabled")
         # self.pro_mode_var.get()
         # プロモードチェック
+
+        settings_menu.add_separator() # ここに線が挿入される
         self.pro_mode_var = tk.BooleanVar(value=False)
         settings_menu.add_checkbutton(
             label="Proモード",
@@ -144,11 +146,15 @@ class ChartEditor(tk.Tk):
         self.note_type_var = tk.StringVar(value="Tap")
         settings_choose_Notes = tk.Menu(menubar, tearoff=0)
         settings_choose.add_cascade(label="ノーツ", menu=settings_choose_Notes)#,state="disabled"
+        settings_choose_Notes.add_radiobutton(label = "通常ノーツ",  variable = self.note_type_var, value = "Header",state="disabled")
         settings_choose_Notes.add_radiobutton(label = "Tap",  accelerator="1",  variable = self.note_type_var, value = "Tap")
         settings_choose_Notes.add_radiobutton(label = "Feel",  accelerator="2",  variable = self.note_type_var, value = "Feel")
         settings_choose_Notes.add_radiobutton(label = "Slide-L",  accelerator="3",  variable = self.note_type_var, value = "Slide-L")
         settings_choose_Notes.add_radiobutton(label = "Slide-R",  accelerator="4",  variable = self.note_type_var, value = "Slide-R")
         settings_choose_Notes.add_radiobutton(label = "Hold",  accelerator="5",  variable = self.note_type_var, value = "Hold",state="disabled")
+        settings_choose_Notes.add_separator() # ここに線が挿入される
+        settings_choose_Notes.add_radiobutton(label = "派生ノーツ",  variable = self.note_type_var, value = "Header",state="disabled")
+        settings_choose_Notes.add_radiobutton(label = "Grace-Tap",  variable = self.note_type_var, value = "Grace-Tap",state="disabled")
         # note_types = ["Tap", "Feel", "Slide-L", "Slide-R", "Hold"]
         self.mode_var.set("ノーツ配置(N)")  # 初期値
         # if self.pro_mode_var.get() else"ノーツ配置"
@@ -193,6 +199,23 @@ class ChartEditor(tk.Tk):
 
         #self.mode_label = ttk.Label(mode_frame, text=f"現在のモード: {self.mode}")
         #self.mode_label.pack(side="left", padx=10)
+        bar_frame = ttk.Frame(self)
+        bar_frame.pack(fill="x", pady=3)
+        self.play_pos = tk.DoubleVar(value=0)
+        # スライダーUI追加
+        self.seek_scale = tk.Scale(
+            bar_frame,
+            from_=0,
+            to=100,  # 後で音源読み込み後に正しい長さに変更
+            orient="horizontal",
+            resolution=0.01,  # ★ ここを追加 ★
+            variable=self.play_pos,
+            command=self.on_seek_change,
+            length=400,
+            label="再生位置(L:-秒)",
+            state="disabled"
+        )
+        self.seek_scale.pack(side="bottom", fill="x")
 
 
         frame = ttk.Frame(self)

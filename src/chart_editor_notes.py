@@ -1,5 +1,4 @@
 from chart_editor_lanes import ChartEditor
-import json
 import math
 
 class ChartEditor(ChartEditor):
@@ -133,22 +132,32 @@ class ChartEditor(ChartEditor):
         lane_norm = self.interpolate_lane_x(note["lane"], note["measure"])
         lane_x = ((lane_norm + 1) / 2) * (540 - 180) + 180
         y = -(note["measure"] * self.measure_height + (note["beat"] / 4) * self.measure_height)
-
+        x_limit = ((1/2*self.canvas_width)+(self.canvas_width/2))/12
         note_type = note.get("type", "Tap")
         size = 10
+
+        if note_type == "Tap" or note_type == "Feel":
+            self.canvas.create_rectangle(
+                (lane_x - x_limit), (y - (size * 0.3)), (lane_x + x_limit), (y + (size * 0.3)),
+                fill="white", outline="", tags="note"
+            )
 
         # 色と形の選択
         if note_type == "Tap":
             color = "cyan"
             self.canvas.create_rectangle(
-                lane_x - size, y - (size * 0.3), lane_x + size, y + (size * 0.3),
+                (lane_x - x_limit)+1, (y - (size * 0.3))+1, (lane_x + x_limit)-1, (y + (size * 0.3))-1,
                 fill=color, outline="", tags="note"
+            )
+            self.canvas.create_rectangle(
+                (lane_x - (x_limit+1)/2), (y - ((size * 0.3)-1)/2), (lane_x + (x_limit-1)/2), (y + ((size * 0.3)-1)/2),
+                fill="white", outline="", tags="note"
             )
 
         elif note_type == "Feel":
             color = "yellow"
             self.canvas.create_rectangle(
-                lane_x - size, y - (size * 0.3), lane_x + size, y + (size * 0.3),
+                (lane_x - x_limit)+1, (y - (size * 0.3))+1, (lane_x + x_limit)-1, (y + (size * 0.3))-1,
                 fill=color, outline="", tags="note"
             )
 

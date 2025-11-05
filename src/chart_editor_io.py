@@ -1,7 +1,7 @@
 from chart_editor_notes import ChartEditor
 from tkinter import filedialog, messagebox
 import re
-
+import os
 class ChartEditor(ChartEditor):
 
     # ===============================
@@ -31,32 +31,37 @@ class ChartEditor(ChartEditor):
                 lines.append(f"{kf['timing']} | [{pos_list}]")
 
         # ===== ノーツブロック =====
+        # レイヤーごとにまとめる
         layers = sorted(set(note["layer"] for note in self.notes))
         for layer in layers:
             lines.append(f"#layer:{layer}")
-            layer_notes = [n for n in self.notes if n["layer"] == layer]
-            for n in sorted(layer_notes, key=lambda x: (x["measure"], x["beat"])):
-                t = n["measure"] + n["beat"] / 4
-                #note_types = ["Tap", "Feel", "Slide-L", "Slide-R", "Hold"]
+
+            # --- 同レイヤー内のノーツを measure+beat でまとめる ---
+            grouped = {}
+            for note in self.notes:
+                if note["layer"] != layer:
+                    continue
+                # 時刻キー（小節＋拍）をfloatで統一
+                timing = note["measure"] + note["beat"] / 4.0
+                if timing not in grouped:
+                    grouped[timing] = ["-N"] * self.lane_count
                 # ノーツ種別変換
-                note_type = n["type"]
-                if note_type == "Tap":
-                    mark = "-T"
-                elif note_type == "Feel":
-                    mark = "-F"
-                elif note_type == "Slide-L":
-                    mark = "SL"
-                elif note_type == "Slide-R":
-                    mark = "SR"
-                else:
-                    mark = "-N"
+                if note["type"] == "Tap":
+                    grouped[timing][note["lane"]] = "-T"
+                elif note["type"] == "Feel":
+                    grouped[timing][note["lane"]] = "-F"
+                elif note["type"] == "Slide-L":
+                    grouped[timing][note["lane"]] = "SL"
+                elif note["type"] == "Slide-R":
+                    grouped[timing][note["lane"]] = "SR"
+                elif note["type"] == "Hold":
+                    grouped[timing][note["lane"]] = "-H"
+                # note_types = ["Tap", "Feel", "Slide-L", "Slide-R", "Hold"]
 
-                # lane に応じて配置
-                notes_row = ["-N"] * self.lane_count
-                notes_row[n["lane"]] = mark
-                notes_text = ",".join(notes_row)
-
-                lines.append(f"{t:.3f} | {notes_text} |")
+            # --- 時間順にソートして出力 ---
+            for timing in sorted(grouped.keys()):
+                line = f"{timing:.3f} | {','.join(grouped[timing])} |"
+                lines.append(line)
 
         try:
             with open(path, "w", encoding="utf-8") as f:

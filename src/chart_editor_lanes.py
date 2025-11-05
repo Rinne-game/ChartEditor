@@ -1,7 +1,4 @@
 from chart_editor_base import ChartEditor
-from tkinter import filedialog
-from tkinter import ttk
-import json
 
 class ChartEditor(ChartEditor):
     def on_canvas_click_Lane(self, event):
@@ -76,7 +73,7 @@ class ChartEditor(ChartEditor):
             self.canvas.create_line(self.canvas_width/2, y, self.canvas_width*3/2, y, fill=color, width=width, tags="grid")
             if m < self.total_measures:
                 text_color = "white" if not is_strong else "#A0D8FF"
-                self.canvas.create_text(-25+self.canvas_width/2, y-5, text=str(m+1),
+                self.canvas.create_text(-25+self.canvas_width/2, y-5, text=str(m),
                                         fill=text_color, font=("Arial", 12, "bold"), anchor="s", tags="grid")
         for m in range(self.total_measures):
             for beat in range(1,4):
