@@ -6,7 +6,7 @@ class ChartEditor(tk.Tk):
     def __init__(self):
         # chart_editor_base.py など
         APP_NAME = "TapLine 譜面エディター"
-        APP_VERSION = "1.0.2"
+        APP_VERSION = "1.0.2.2"
         super().__init__()
         self.title(f"{APP_NAME} Ver.{APP_VERSION}")
         self.geometry("1000x980")

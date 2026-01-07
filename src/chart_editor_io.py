@@ -29,7 +29,7 @@ class ChartEditor(ChartEditor):
             lines.append("##lane_move")
             for kf in self.lane_keyframes:
                 pos_list = ",".join(f"{x:.4f}" for x in kf["posx"])
-                lines.append(f"{kf['timing']}| [{pos_list}]")
+                lines.append(f"{kf['timing']*4.0}| [{pos_list}]")
 
         # ===== レイヤーブロック =====
         layers = sorted(set(note["layer"] for note in self.notes))
@@ -41,7 +41,7 @@ class ChartEditor(ChartEditor):
                 if note["layer"] != layer:
                     continue
 
-                timing = note["measure"] + note["beat"] / 4.0
+                timing = note["measure"] + note["beat"]/4.0 #/ 4.0
                 if timing not in grouped:
                     grouped[timing] = ["-N"] * self.lane_count
 
@@ -57,7 +57,7 @@ class ChartEditor(ChartEditor):
                     grouped[timing][note["lane"]] = "-H"
 
             for timing in sorted(grouped.keys()):
-                line = f"{timing:.3f}| {','.join(grouped[timing])} |"
+                line = f"{(timing*4.0):.3f}| {','.join(grouped[timing])} |"
                 lines.append(line)
 
         try:
@@ -94,6 +94,8 @@ class ChartEditor(ChartEditor):
         lane_move_pattern = re.compile(r"([\d.]+)\s*\|\s*\[([0-9eE+,\-. ]+)\]")
         note_line_pattern = re.compile(r"([\d.]+)\s*\|\s*([^\|]*)\|")
 
+
+
         for line in lines:
             line = line.strip()
             if not line:
@@ -120,7 +122,7 @@ class ChartEditor(ChartEditor):
             if mode == "lane_move":
                 m = lane_move_pattern.match(line)
                 if m:
-                    timing = float(m.group(1))
+                    timing = float(m.group(1))/4.0
                     posx = [float(x) for x in m.group(2).split(",")]
                     self.lane_keyframes.append({"timing": timing, "posx": posx})
                 continue
@@ -129,8 +131,7 @@ class ChartEditor(ChartEditor):
                 m = note_line_pattern.match(line)
                 if not m:
                     continue
-
-                t = float(m.group(1))
+                t = float(m.group(1))/4.0
                 note_list = [n.strip() for n in m.group(2).split(",")]
 
                 for i, mark in enumerate(note_list):
@@ -149,6 +150,11 @@ class ChartEditor(ChartEditor):
                         "type": ntype,
                         "layer": current_layer
                     })
+        if not include_lane_move:
+            self.lane_keyframes.append({
+                "timing": 0.0,  # 初期タイミング
+                "posx": [(((i)/(self.lane_count)) * 2 - 1 + (1/(self.lane_count))) for i in range(self.lane_count)]
+            })
 
         self.redraw_all()
         messagebox.showinfo("読み込み完了", f"{path} を読み込みました。")
