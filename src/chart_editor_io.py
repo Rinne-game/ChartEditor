@@ -2,11 +2,10 @@ from chart_editor_notes import ChartEditor
 from tkinter import filedialog, messagebox
 import re
 import os
-
 class ChartEditor(ChartEditor):
 
     # ===============================
-    # 📤 保存 (.tlc / .rgc)
+    # 📤 保存 (.tlc)
     # ===============================
     def save_tlc(self, event=None):
         path = filedialog.asksaveasfilename(
@@ -17,34 +16,35 @@ class ChartEditor(ChartEditor):
         if not path:
             return
         
+        # 出力形式を拡張子で判断
         ext = os.path.splitext(path)[1].lower()
         include_lane_move = (ext == ".tlc")
 
         lines = []
-        # ✅ lane= から lane: に修正
-        lines.append(f"lane:{self.lane_count}")
+        lines.append(f"lane={self.lane_count}")  # lane行
 
-        # ===== lane_move 出力 =====
+        # ===== レーン位置ブロック =====
         if include_lane_move:
             lines.append("##lane_move")
             for kf in self.lane_keyframes:
                 pos_list = ",".join(f"{x:.4f}" for x in kf["posx"])
-                lines.append(f"{kf['timing']*4.0}| [{pos_list}]")
+                lines.append(f"{kf['timing']} | [{pos_list}]")
 
-        # ===== レイヤーブロック =====
+        # ===== ノーツブロック =====
+        # レイヤーごとにまとめる
         layers = sorted(set(note["layer"] for note in self.notes))
         for layer in layers:
             lines.append(f"#layer:{layer}")
 
+            # --- 同レイヤー内のノーツを measure+beat でまとめる ---
             grouped = {}
             for note in self.notes:
                 if note["layer"] != layer:
                     continue
-
-                timing = note["measure"] + note["beat"]/4.0 #/ 4.0
+                timing = note["measure"] + note["beat"] / 4.0
                 if timing not in grouped:
                     grouped[timing] = ["-N"] * self.lane_count
-
+                # ノーツ種別変換
                 if note["type"] == "Tap":
                     grouped[timing][note["lane"]] = "-T"
                 elif note["type"] == "Feel":
@@ -55,9 +55,11 @@ class ChartEditor(ChartEditor):
                     grouped[timing][note["lane"]] = "SR"
                 elif note["type"] == "Hold":
                     grouped[timing][note["lane"]] = "-H"
+                # note_types = ["Tap", "Feel", "Slide-L", "Slide-R", "Hold"]
 
+            # --- 時間順にソートして出力 ---
             for timing in sorted(grouped.keys()):
-                line = f"{(timing*4.0):.3f}| {','.join(grouped[timing])} |"
+                line = f"{timing:.3f} | {','.join(grouped[timing])} |"
                 lines.append(line)
 
         try:
@@ -69,13 +71,14 @@ class ChartEditor(ChartEditor):
 
 
     # ===============================
-    # 📥 読み込み (.tlc / .rgc)
+    # 📥 読み込み (.tlc)
     # ===============================
     def load_tlc(self, event=None):
         path = filedialog.askopenfilename(
             title="譜面ファイルを読み込み",
             filetypes=[("TapLineChart/RythmGame Chart", "*.tlc *.rgc")]
         )
+        #("音楽ファイル", "*.mp3 *.ogg"),  # oggは将来的に有効化
         if not path:
             return
 
@@ -101,9 +104,8 @@ class ChartEditor(ChartEditor):
             if not line:
                 continue
 
-            # ✅ lane= → lane:
-            if line.startswith("lane:"):
-                self.lane_count = int(line.split(":")[1])
+            if line.startswith("lane="):
+                self.lane_count = int(line.split("=")[1])
                 continue
 
             elif line.startswith("#layer:"):
@@ -116,9 +118,10 @@ class ChartEditor(ChartEditor):
                 continue
 
             elif line.startswith("##"):
-                mode = None
+                mode = None  # 将来対応予定ブロック
                 continue
 
+            # ===== lane_moveブロック =====
             if mode == "lane_move":
                 m = lane_move_pattern.match(line)
                 if m:
@@ -127,19 +130,26 @@ class ChartEditor(ChartEditor):
                     self.lane_keyframes.append({"timing": timing, "posx": posx})
                 continue
 
+            # ===== layerブロック =====
             if mode == "layer":
                 m = note_line_pattern.match(line)
                 if not m:
                     continue
-                t = float(m.group(1))/4.0
+                t = float(m.group(1))
                 note_list = [n.strip() for n in m.group(2).split(",")]
 
+                #note_types = ["Tap", "Feel", "Slide-L", "Slide-R", "Hold"]
                 for i, mark in enumerate(note_list):
-                    if mark == "-T": ntype = "Tap"
-                    elif mark == "-F": ntype = "Feel"
-                    elif mark == "SL": ntype = "Slide-L"
-                    elif mark == "SR": ntype = "Slide-R"
-                    elif mark == "-H": ntype = "Hold"
+                    if mark == "-N":
+                        continue
+                    elif mark == "-T":
+                        ntype = "Tap"
+                    elif mark == "-F":
+                        ntype = "Feel"
+                    elif mark == "SL":
+                        ntype = "Slide-L"
+                    elif mark == "SR":
+                        ntype = "Slide-R"
                     else:
                         continue
 
