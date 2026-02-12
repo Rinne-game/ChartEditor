@@ -13,10 +13,10 @@
     <string>com.rinnegames.app</string>
 
     <key>CFBundleVersion</key>
-    <string>1.0.2</string>
+    <string>1.0.2.2</string>
 
     <key>CFBundleShortVersionString</key>
-    <string>1.0.2</string>
+    <string>1.0.2.2</string>
 
     <key>CFBundleExecutable</key>
     <string>RinnegamesApp</string>

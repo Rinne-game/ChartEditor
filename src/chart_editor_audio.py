@@ -44,7 +44,7 @@ class ChartEditor(ChartEditor):
 
             duration_sec = audio.info.length  # 秒単位
             bpm = self.bpm.get()  # chart_editor_base.py の self.bpm
-            self.total_measures = math.ceil(duration_sec * bpm / 60 / 4)
+            self.total_measures = math.ceil(duration_sec * bpm / 60 / 4 *4)
             print(f"曲の長さ: {duration_sec:.2f}秒, total_measures: {self.total_measures}")
 
             self.startF = False
@@ -107,14 +107,14 @@ class ChartEditor(ChartEditor):
             pos = pygame.mixer.music.get_pos() / 1000.0  # ms→秒
             self.play_pos.set(pos+(self.audio_position_Start / 1000.0))
         bpm = self.bpm.get()  # chart_editor_base.py の self.bpm
-        measures = (pos_ms / 1000.0) * bpm / 60 / 4
+        measures = (pos_ms / 1000.0) * bpm / 60 / 4  * 4
         return measures
     def get_position_from_measures(self, measures):
         """
         小節数(measures)から再生位置をミリ秒単位で返す
         """
         bpm = self.bpm.get()  # chart_editor_base.py の self.bpm
-        pos_ms = measures * 4 * 60 * 1000 / bpm
+        pos_ms = measures * 4 * 60 * 1000 / bpm  *4
         return pos_ms
 
     def drew_audio_play_line(self):

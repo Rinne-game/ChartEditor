@@ -14,7 +14,7 @@ class ChartEditor(tk.Tk):
         self.bpm = tk.DoubleVar(value=120.0)
         self.lane_count = 4
         self.total_measures = 4
-        self.measure_height = 400
+        self.measure_height = 100
         self.canvas_width = 360
         self.audio_path = None
         self.is_playing = False

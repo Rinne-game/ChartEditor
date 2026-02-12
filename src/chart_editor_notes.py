@@ -25,7 +25,7 @@ class ChartEditor(ChartEditor):
         }.get(mode, None)
 
         if snap_div:
-            snap_unit = 1 / snap_div
+            snap_unit = 1 / (snap_div/4)
             beat_fraction = round(beat_fraction / snap_unit) * snap_unit
 
         # === レーン推定 ===
