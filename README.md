@@ -5,7 +5,8 @@ AI支援（ChatGPT）を活用して開発されました。
 
 ## 譜面変換ツール（Malody → rgc）
 Malodyからrgc形式への譜面変換ツールを作りました。  
-[譜面変換ツール](https://rinnegames.net/tools/ChartImporter/)
+[譜面変換ツール](https://rinnegames.net/tools/ChartImporter/)  
+※このエディターは、現状として、Holdには対応していません。
 ## お願い
 このエディターは、ビルド済みアプリを大きいアップデートをしたバージョンでしか配布していません。  
 細かい修正については、ソースコードから各自でビルドしていただくか、`main.py`を走らせてください。  
