@@ -2,6 +2,10 @@
 Rinnegamesで使用している、音楽ゲーム向けのEditorです。
 AI支援（ChatGPT）を活用して開発されました。 
 企画・仕様設計および最終調整：Rinnegames（凛音）
+
+## 譜面変換ツール（Malody → rgc）
+Malodyからrgc形式への譜面変換ツールを作りました。  
+[譜面変換ツール](https://rinnegames.net/tools/ChartImporter/)
 ## お願い
 このエディターは、ビルド済みアプリを大きいアップデートをしたバージョンでしか配布していません。  
 細かい修正については、ソースコードから各自でビルドしていただくか、`main.py`を走らせてください。  
